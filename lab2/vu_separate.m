@@ -1,3 +1,5 @@
+%FOR TASK 4!!!
+
 function [x_v,x_u] = vu_separate(signal, N, threshold)
 %vu_separate is function for separation vocal part from unvocal of signal
 

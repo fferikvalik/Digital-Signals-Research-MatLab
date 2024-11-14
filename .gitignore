@@ -1,6 +1,8 @@
 # Ignore all .wav files
 *.wav
-
+*.mp3
+*.mp4
+*.png
 # Other files to ignore can be added below
 *.tmp
 *.log
