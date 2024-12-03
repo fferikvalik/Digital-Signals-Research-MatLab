@@ -1,43 +1,30 @@
-clearvars
-clc
+% Параметры генерации звука
+L = 32000;       % Длина сигнала (количество отсчётов)
+fs = 44100;      % Частота дискретизации (Гц)
+a = 0.95;        % Коэффициент затухания
+f_0 = 440;       % Частота ноты Ля первой октавы (Гц)
+M = round(fs / f_0); % Период задержки в отсчётах, соответствующий частоте f_0
 
-% sistem operation
-M = 100; 
-w = linspace(0, 2 * pi, 1000);
+% Генерация начального белого шума
+x = zeros(1, L);        % Создание нулевого сигнала длины L
+x(1:M) = (1 / 10) * (rand(1, M) - 0.5); % Первые M отсчётов — случайный шум с малой амплитудой
 
-% sistem coeff
-b = [0, 1];
-a = [1, 0, 0.1, -0.1];
+% Инициализация выходного сигнала
+y = zeros(1, L);        % Создание нулевого выходного сигнала длины L
+y(1:M) = x(1:M);        % Копирование начального шума в выходной сигнал
 
-% impulse response h(m)
-x = zeros(1, M+1);
-x(1) = 1;
-h = filter(b, a, x);
-
-% calculation frequency response H(exp(jw))
-H = zeros(size(w));
-for i = 1:length(w)
-    H(i) = sum(h .* exp(-1i * w(i) * (0:M)));
+% Реализация алгоритма Карплуса-Стронга
+for n = M+1:L
+    y(n) = x(n) + a * y(n - M); % Добавление затухания через коэффициент a
 end
 
-% calculation frequency response and phase response
-frequency_response_H = abs(H);
-phase_response_H = angle(H);
+% Воспроизведение звука
+sound(y, fs);           % Воспроизведение звукового сигнала с частотой дискретизации fs
 
-% graph frequency response and phase response output 
-subplot(2, 1, 1);
-plot(w, frequency_response_H, 'b', 'LineWidth', 1.5);
-title('Амплитудная частотная характеристика (АЧХ)', 'FontSize', 14);
-xlabel('Частота', 'FontSize', 14);
-ylabel('\(|H(e^{j\omega})|\))', 'Interpreter','latex','FontSize', 14);
-grid on;
+% Построение графика выходного сигнала
+plot(y, 'b');           % Построение графика выходного сигнала
+title('Нота Ля первой октавы'); % Заголовок графика
+grid on;                % Включение сетки на графике
 
-subplot(2, 1, 2);
-plot(w, phase_response_H, 'r', 'LineWidth', 1.5);
-title('Фазовая частотная характеристика (ФЧХ)','FontSize', 14);
-xlabel('Частота','FontSize', 14);
-ylabel('Фаза','FontSize', 14);
-grid on;
-
-FileName = 'Task_6.png';
-print('-dpng', '-opengl','-r300',FileName);
+% Сохранение выходного сигнала в аудиофайл
+audiowrite('ks_out.wav', y, fs); % Сохранение звукового сигнала в файл ks_out.wav

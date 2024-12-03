@@ -1,60 +1,24 @@
-clearvars
-clc
+% Основной скрипт
+n = 0:50; 
+x_n = delta(n); % Дельта-функция
+y_n = fun_dis_system(x_n); % Реализация системы
 
-mu = 255;
-x_n = -1:0.1:1;
-for i = 1:length(x_n)
-    sign_resl(i) = sign_function(x_n(i));
-end 
+% Графики
+subplot(2, 1, 1); 
+hold on 
+stem(n, x_n, 'k'); 
+title("x(n)"); 
+xlabel("n"); ylabel("Амплитуда");
+grid on;
 
-y_n = sign_resl.*(log10(1 + mu*abs(x_n))/log10(1+mu));
+subplot(2, 1, 2); 
+hold on 
+stem(n, y_n, 'b'); 
+title("Реакция дискретной системы на дельта-импульс"); 
+xlabel("n"); ylabel("Амплитуда");
+grid on;
 
-% check additivity
-x = x_n(5) + x_n(12);
-sign_resl = sign_function(x);
-y = sign_resl.*(log10(1 + mu*abs(x))/log10(1+mu));
-y5 = y_n(5);
-y12 = y_n(12);
-y_final = y5 + y12;
-if y_final == y
-    fprintf('функция аддитивна\n');
-else
-    fprintf('функция не аддитивна\n');
-end
-
-% check uniformity
-x = x_n(3) * 5;
-sign_resl = sign_function(x);
-y = sign_resl.*(log10(1 + mu*abs(x))/log10(1+mu));
-y3 = 5 * y_n(3);
-if y3 == y
-    fprintf('функция однородна\n');
-else
-    fprintf('функция не однородна\n');
-end
-
-% linearity check
-x = 2 * x_n(4) + 3 * x_n(7);
-sign_resl = sign_function(x);
-y = sign_resl.*(log10(1 + mu*abs(x))/log10(1+mu));
-sign_resl = sign_function(x_n(4));
-y4 =  sign_resl.*(log10(1 + mu*abs(x_n(4)))/log10(1+mu));
-sign_resl = sign_function(x_n(7));
-y7 = sign_resl.*(log10(1 + mu*abs(x_n(7)))/log10(1+mu));
-y_final = 2* y4 + 3*y7;
-if y_final == y
-    fprintf('функция линейная\n');
-else
-    fprintf('функция не линейная\n');
-end
-
-% stationarity check
-x = x_n(4-2);
-sign_resl = sign_function(x);
-y = sign_resl.*(log10(1 + mu*abs(x))/log10(1+mu));
-y_final = y_n(4-2);
-if y_final == y
-    fprintf('функция стационарна\n');
-else
-    fprintf('функция не стационарна\n');
+% Функция дельта-импульса
+function [d] = delta(n)
+    d = (n == 0); % Дельта-функция: 1 в нуле, 0 в остальных
 end

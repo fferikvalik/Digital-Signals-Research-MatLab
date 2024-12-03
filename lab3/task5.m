@@ -1,31 +1,32 @@
-clearvars
-clc
+% Коэффициенты разностного уравнения
+b = [1 0 0.4];        % Коэффициенты числителя
+a = [1 0.5 -0.2];     % Коэффициенты знаменателя
 
-% impuls options
-N = 64;
-x_impuls = zeros(1, N);
-x_impuls(1) = 1;
-b = [0, 1];
-a = [1, 0, 0.1, -0.1];
-y = filter(b, a, x_impuls);
- 
-% graph output
+% Частотный диапазон
+[H, omega] = freqz(b, a, 1024); % Частотная характеристика
+
+% Амплитудный и фазовый отклики
+magnitude_response = abs(H);    % Модуль H(e^{jω}) - АЧХ
+phase_response = angle(H);      % Фаза H(e^{jω}) - ФЧХ
+
+% Построение графиков
+figure;
+
 subplot(2, 1, 1);
-hold on
-stem(0:N-1, x_impuls, 'b', 'LineWidth', 1.5);
-title('Импульсный входной сигнал x(n)', 'FontSize', 14);
-xlabel('n', 'Interpreter','latex','FontSize', 14);
-ylabel('Амплитуда','FontSize', 14);
-grid on
+plot(omega/pi, magnitude_response, 'b', 'LineWidth', 1.5);
+title('Амплитудно-частотная характеристика (АЧХ)');
+xlabel('\omega / \pi');  
+ylabel('|H(e^{j\omega})|');
+grid on;
 
 subplot(2, 1, 2);
-hold on
-stem(0:N-1, y, 'r', 'LineWidth', 1.5);
-title('Импульсный выходной сигнал y(n)', 'FontSize', 14);
-xlabel('n', 'Interpreter','latex','FontSize', 14);
-ylabel('Амплитуда', 'FontSize', 14);
-grid on
+plot(omega/pi, phase_response, 'k', 'LineWidth', 1.5);
+title('Фазо-частотная характеристика (ФЧХ)');
+xlabel('\omega / \pi');  
+ylabel('arg(H(e^{j\omega}))');
+grid on;
 
-
-FileName = 'Task_5.png';
-print('-dpng', '-opengl','-r300',FileName);
+% Поиск частоты, где АЧХ минимальна
+[H_min, idx_min] = min(magnitude_response);
+omega_0 = omega(idx_min) / pi; % Частота с минимальной АЧХ в нормированных единицах
+fprintf('Минимум АЧХ достигается при \u03c9_0 = %.3fπ, |H(e^{j\u03c9_0})| = %.3f\n', omega_0, H_min);
